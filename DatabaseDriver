@@ -1,0 +1,114 @@
+//CSE 214 R05 Chris Rojas, 111650075
+import java.io.*;
+import java.util.Scanner;
+
+public class DatabaseDriver {
+    public static void main (String[] args) throws IOException{
+        Scanner scan = new Scanner(System.in);
+
+        //Creates a new HashedLibrary
+        HashedLibrary myLibrary = new HashedLibrary();
+
+        //Checks to see if there is a file named filename of file type 3D obj
+        //If there is, it will load that file and assign the values it has to the
+        //recently created HashedLibrary
+        try {
+            FileInputStream file = new FileInputStream("filename.obj");
+            ObjectInputStream fin = new ObjectInputStream(file);
+            myLibrary = (HashedLibrary) fin.readObject();
+            fin.close();
+        }
+
+        //If no such file is found, move on with the program, it will generate such a file
+        //once the user decides to quit out using the given menu key. It first, however, will
+        //catch the ClassNotFound or FileNotFound exception when filename.obj is not found
+        catch (ClassNotFoundException e){
+            System.out.print("myLibrary.obj not found, using new Hashed Library . . .");
+            System.out.println();
+        }
+        catch (FileNotFoundException e){
+            System.out.print("myLibrary.obj not found, using new Hashed Library . . .");
+            System.out.println();
+        }
+
+        String menu = "[D] Display books\n[G] Get book\n[L] Load file\n" +
+                "[R] Record book\n[Q] Quit\n" + "Enter a selection: ";
+
+
+        System.out.print(menu);
+        String userInput = scan.nextLine();
+
+        while (userInput != null){
+            if (userInput.equalsIgnoreCase("D")){
+                myLibrary.printCatalog();
+                System.out.println();
+            }
+
+            else if (userInput.equalsIgnoreCase("G")){
+                System.out.print("Enter ISBN number of the book you wish to retrieve: ");
+                userInput = scan.nextLine();
+                Book returnBook = myLibrary.getBookByisbn(userInput);
+
+                if (returnBook == null){
+                    System.out.print("This book does not exist in this hashed library. \n");
+                }
+
+                else {
+                    System.out.print(returnBook.getIsbn() + ": " + returnBook + "published by "
+                      + returnBook.getPublisher());
+                    System.out.println();
+                }
+            }
+
+            else if (userInput.equalsIgnoreCase("L")){
+                System.out.print("Enter the file to load: ");
+                String fileName = scan.nextLine();
+
+                myLibrary.addAllBookInfo(fileName);
+                myLibrary.loadCatalog();
+                System.out.println();
+            }
+
+            else if (userInput.equalsIgnoreCase("R")){
+                System.out.print("Enter the title of the book: ");
+                String title = scan.nextLine();
+
+                System.out.print("Enter the author of the book: ");
+                String author = scan.nextLine();
+
+                System.out.print("Enter the publisher of the book: ");
+                String publisher = scan.nextLine();
+
+                System.out.print("Enter the ISBN number of the book: ");
+                String isbn = scan.nextLine();
+
+                myLibrary.addBook(title, author, publisher, isbn);
+
+                System.out.print(isbn + ": " + title + " by " + author + " recorded.");
+                System.out.println();
+            }
+
+            else if (userInput.equalsIgnoreCase("Q")){
+                System.out.print("Saving library to disk. . . . .");
+
+                //Creates a binary file and saves the current myLibrary hashedLibrary
+                //to this file, so that it may be opened with the saved data in future
+                //program runs.
+                FileOutputStream file = new FileOutputStream("filename.obj");
+                ObjectOutputStream fout = new ObjectOutputStream(file);
+                fout.writeObject(myLibrary);
+                fout.close();
+
+                System.out.println();
+                break;
+            }
+
+            System.out.println();
+            System.out.print(menu);
+            userInput = scan.nextLine();
+        }
+
+        System.out.println();
+        System.out.print("Program terminating successfully . . . .");
+    }
+}
