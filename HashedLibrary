@@ -1,0 +1,141 @@
+//CSE 214 R05 Chris Rojas, 111650075
+import java.io.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import big.data.*;
+
+public class HashedLibrary implements Serializable{
+    /**
+     * Creates a new Hashtable object where Long is the value taken for generating
+     * keys and Book is the object to be stored.
+     */
+    private Hashtable<Long, Book> bookShelves = new Hashtable();
+
+    /**
+     * Constructor for HashedLibrary object
+     */
+    public HashedLibrary(){
+    }
+
+    /**
+     * Hashkey function that generates a key for a given book object for
+     * placement in the hashtable 'bookshelves'
+     * @param isbn String value representing isbn number, is parsed into a Long type
+     * @return position in which the object will go in the hash table
+     */
+    public Long generateKey(String isbn){
+        Long key = Long.parseLong(isbn) % 11;
+        return key;
+    }
+
+    /**
+     * AddBook method allows a book object to be added into a given hash table.
+     * Takes in various String inputs and assigns them to the book object.
+     * @param title String value representing the title of the book to be added
+     * @param author String value representing the author of the book to be added
+     * @param publisher String value representing the publisher of the book to be added
+     * @param isbn String value representing the isbn number of the book to be added
+     */
+    public void addBook(String title, String author, String publisher, String isbn){
+        Book newBook = new Book();
+
+        newBook.setTitle(title);
+        newBook.setAuthor(author);
+        newBook.setPublisher(publisher);
+        newBook.setIsbn(isbn);
+
+        Long key = generateKey(isbn);
+
+        bookShelves.put(key, newBook);
+    }
+
+    /**
+     * This method allows the reading of a txt file with various titles or names of
+     * xml files that can be found on a given website, parses the info and connects to
+     * the site in order to extract data and add it to the hash table
+     * @param fileName Name of file to be parsed
+     * @throws IOException For when the file is not found or does not exist.
+     */
+    public void addAllBookInfo(String fileName) throws IOException{
+        FileInputStream fis = new FileInputStream(fileName);
+        InputStreamReader inStream = new InputStreamReader(fis);
+        BufferedReader reader = new BufferedReader(inStream);
+
+        String book = reader.readLine();
+
+        while (book != null){
+            DataSource ds = DataSource.connect("http://www3.cs.stonybrook.edu/~cse214/hw/hw6/" +
+                    book + ".xml").load();
+
+            String title = ds.fetchString("title");
+            String author = ds.fetchString("author");
+            String publisher = ds.fetchString("publisher");
+            String isbn = ds.fetchString("isbn");
+
+            addBook(title, author, publisher, isbn);
+
+            book = reader.readLine();
+        }
+    }
+
+    /**
+     * Method that searches for and returns a book (if it exists in the
+     * hash table) based on a String value representing the isbn number
+     * @param isbn String value of isbn number that is used to search
+     * @return Book with matching isbn number in the hash table, if it exists
+     */
+    public Book getBookByisbn(String isbn){
+        Book target = new Book();
+        Long key = generateKey(isbn);
+        target = (Book) bookShelves.get(key);
+
+        if (target.getIsbn().equals(isbn)){
+            return target;
+        }
+
+        else if (!target.getIsbn().equals(isbn)){
+            for (Long check = key; check < bookShelves.size(); check++){
+                if (target.getIsbn().equals(isbn)){
+                    target = (Book) bookShelves.get(check);
+                    return target;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Print method that displays books that are being recorded
+     * onto the hash table. Used alongside with addAllBookInfo method
+     */
+    public void loadCatalog(){
+        Enumeration books = bookShelves.keys();
+        Long key;
+
+        while (books.hasMoreElements()){
+            key = (Long) books.nextElement();
+            System.out.println((bookShelves.get(key)).getIsbn() + ": " + bookShelves.get(key)
+              + " recorded.");
+
+        }
+    }
+
+    /**
+     * Displays a more general list of books in a given hash table, assigning
+     * them arbitrary number positions.
+     */
+    public void printCatalog(){
+        int counter = 1;
+        Enumeration books = bookShelves.keys();
+        Long key;
+
+        while (books.hasMoreElements()){
+            key = (Long) books.nextElement();
+            System.out.println(counter + " - " + (bookShelves.get(key)).getIsbn() + ": "
+              + bookShelves.get(key) + " published by " + (bookShelves.get(key)).getPublisher());
+            counter++;
+        }
+    }
+}
