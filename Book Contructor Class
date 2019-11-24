@@ -1,0 +1,81 @@
+//CSE 214 R05 Chris Rojas, 111650075
+import java.io.Serializable;
+
+public class Book implements Serializable{
+    private String title;
+    private String author;
+    private String publisher;
+    private String isbn;
+
+    /**
+     * Accessor method for title of book object
+     * @return String value of title of book
+     */
+    public String getTitle(){
+        return title;
+    }
+
+    /**
+     * Mutator method for title of book object
+     * @param title String value that will be the title of book object
+     */
+    public void setTitle(String title){
+        this.title = title;
+    }
+
+    /**
+     * Accessor method for author of book object
+     * @return String value of author of book
+     */
+    public String getAuthor(){
+        return author;
+    }
+
+    /**
+     * Mutator method for author of book object
+     * @param author String value that will be the author of book object
+     */
+    public void setAuthor(String author){
+        this.author = author;
+    }
+
+    /**
+     * Accessor method for publisher of book object
+     * @return String value of publisher of book
+     */
+    public String getPublisher(){
+        return publisher;
+    }
+
+    /**
+     * Mutator method for publisher of book object
+     * @param publisher String value that will be the publisher of book object
+     */
+    public void setPublisher(String publisher){
+        this.publisher = publisher;
+    }
+
+    /**
+     * Accessor method for isbn number of book object
+     * @return String value of isbn number of book
+     */
+    public String getIsbn(){
+        return isbn;
+    }
+
+    /**
+     * Mutator method for isbn number of book object
+     * @param isbn Stirng value of isbn number of book
+     */
+    public void setIsbn(String isbn){
+        this.isbn = isbn;
+    }
+
+    /**
+     * ToString method of Book object
+     * @return Book object title and author
+     */
+    public String toString(){
+        return title + " by " + author;
+    }
+}
